@@ -5,7 +5,18 @@ const path = require('path');
 
 
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
+app.use(require('express').urlencoded({ extended: false }));
 
+
+app.post('/blocks', async(req, res, next)=> {
+  try {
+    await Block.create(req.body);
+    res.redirect('/');
+  }
+  catch(ex){
+    next(ex);
+  }
+});
 
 app.get('/', async(req, res, next)=> {
   try {
@@ -23,8 +34,32 @@ app.get('/', async(req, res, next)=> {
           <link rel='stylesheet' href='/assets/styles.css' />
         </head>
         <body>
-          <h1>Acme Blocks</h1>
+          <h1><a href='/'>Acme Blocks</a></h1>
           <main>
+            <section>
+              <h1>Create Block</h1>
+              <form method='POST' action='/blocks'>
+                <select name='colorId'>
+                  ${
+                    colors.map( color => {
+                      return `
+                        <option value='${color.id}'>${color.name}</option>
+                      `;
+                    }).join('')
+                  }
+                </select>
+                <select name='shapeId'>
+                  ${
+                    shapes.map( shape => {
+                      return `
+                        <option value='${shape.id}'>${shape.name}</option>
+                      `;
+                    }).join('')
+                  }
+                </select>
+                <button>Create</button>
+              </form>
+            </section>
             <section>
               <h2>Colors</h2>
               <ul>
