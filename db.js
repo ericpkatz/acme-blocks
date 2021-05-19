@@ -58,5 +58,10 @@ const syncAndSeed = async()=> {
 };
 
 module.exports = {
-  syncAndSeed
+  syncAndSeed,
+  models: {
+    Color,
+    Shape,
+    Block
+  }
 };

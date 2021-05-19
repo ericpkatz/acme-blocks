@@ -1,0 +1,14 @@
+body {
+  font-family: verdana;
+}
+
+main {
+  display: flex;
+}
+
+section {
+  flex: 1;
+  border: solid 1px grey;
+  margin: 1rem;
+  padding: 1rem;
+}
