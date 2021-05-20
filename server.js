@@ -6,7 +6,21 @@ const path = require('path');
 
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 app.use(require('express').urlencoded({ extended: false }));
+const middleware = require('method-override')('_method');
+console.log(middleware.toString());
+app.use(middleware);
 
+
+app.delete('/blocks/:id', async(req, res, next)=> {
+  try {
+    const block = await Block.findByPk(req.params.id);
+    await block.destroy();
+    res.redirect('/');
+  }
+  catch(ex){
+    next(ex);
+  }
+});
 
 app.post('/blocks', async(req, res, next)=> {
   try {
@@ -21,8 +35,8 @@ app.post('/blocks', async(req, res, next)=> {
 app.get('/', async(req, res, next)=> {
   try {
     const [shapes, colors, blocks ] = await Promise.all([
-      Shape.findAll(),
-      Color.findAll(),
+      Shape.findAll({ include: [ Block ]}),
+      Color.findAll({ include: [ Block ]}),
       Block.findAll({
         include: [ Color, Shape ]
       })
@@ -67,7 +81,7 @@ app.get('/', async(req, res, next)=> {
                   colors.map( color => {
                     return `
                       <li>
-                        ${ color.name }
+                        ${ color.name } (${ color.blocks.length })
                       </li>
                     `;
                   }).join('')
@@ -81,7 +95,7 @@ app.get('/', async(req, res, next)=> {
                   shapes.map( shape => {
                     return `
                       <li>
-                        ${ shape.name }
+                        ${ shape.name } (${ shape.blocks.length })
                       </li>
                     `;
                   }).join('')
@@ -97,6 +111,9 @@ app.get('/', async(req, res, next)=> {
                       <li>
                         ${ block.color.name }
                         ${ block.shape.name }
+                        <form method='POST' action='/blocks/${block.id}?_method=DELETE'>
+                          <button>x</button>
+                        </form>
                       </li>
                     `;
                   }).join('')

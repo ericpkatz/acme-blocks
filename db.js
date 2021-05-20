@@ -20,6 +20,8 @@ const Block = conn.define('block', {
 
 Block.belongsTo(Color);
 Block.belongsTo(Shape);
+Shape.hasMany(Block);
+Color.hasMany(Block);
 
 const data = {
   colors: ['red', 'blue', 'green', 'dodgerBlue', 'cornsilk'],
